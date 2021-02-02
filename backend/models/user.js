@@ -12,7 +12,7 @@ const userSchema = new mongoose.Schema({
       validator(v) {
         return validator.isEmail(v);
       },
-      message: 'is not an email!',
+      message: 'Укажите email!',
     },
     unique: true,
   },
@@ -24,7 +24,7 @@ const userSchema = new mongoose.Schema({
       validator(v) {
         return validator.isStrongPassword(v);
       },
-      message: 'is not a strong password!',
+      message: 'Задайте другой пароль!',
     },
     select: false, // необходимо добавить поле select
   },
@@ -61,7 +61,7 @@ userSchema.statics.findUserByCredentials = function (email, password) {
       if (!matched) {
         throw new AuthorizationError('Неправильные почта или пароль');
       }
-      return user; // теперь user доступен
+      return user;
     }));
 };
 

@@ -39,8 +39,11 @@ function App() {
     handleCardClick();
   }
 
+
   React.useEffect(() => {
-    Promise.all([api.getUserInform(), api.getCards()])
+    const jwt = localStorage.getItem("jwt")
+    console.log(localStorage);
+    Promise.all([api.getUserInform(jwt), api.getCards(jwt)])
       .then(([user, cards]) => {
         setCurrentUser(user);
         setCards(cards);
@@ -190,9 +193,11 @@ function App() {
     return auth
       .authorize(email, password)
       .then((res) => {
+        console.log(res);
         if (res && res.token) {
+          localStorage.setItem("jwt", res.token);
+          console.log(res);
           setLoggedIn(true);
-          tokenCheck();
           history.push("/");
         } else {
           throw new Error('Не удалось войти в аккаунт')

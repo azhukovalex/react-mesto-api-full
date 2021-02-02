@@ -63,10 +63,9 @@ const updateUser = (req, res) => {
       name: req.body.name,
       about: req.body.about,
     },
-    // Передадим объект опций:
     {
-      new: true, // обработчик then получит на вход обновлённую запись
-      runValidators: true, // данные будут валидированы перед изменением
+      new: true,
+      runValidators: true,
     },
   )
     .orFail()
@@ -88,13 +87,13 @@ const updateAvatar = (req, res) => {
     {
       avatar: req.body.avatar,
     },
-    // Передадим объект опций:
+
     {
-      new: true, // обработчик then получит на вход обновлённую запись
-      runValidators: true, // данные будут валидированы перед изменением
+      new: true,
+      runValidators: true,
     },
   )
-    .orFail(new Error('ValidationError'))
+    .orFail(new BadRequestError({ message: 'Ошибка при валидации.' }))
     .then((newAvatar) => {
       res.status(200).send(newAvatar);
     })
@@ -115,11 +114,6 @@ const login = (req, res, next) => {
         { _id: user._id }, NODE_ENV === 'production' ? JWT_SECRET : 'dev-secret', { expiresIn: '7d' },
       );
       res
-        /* .cookie('jwt', token, {
-          maxAge: 3600000 * 24 * 7,
-          httpOnly: true,
-          sameSite: true,
-        }) */
         .send({ token: token.toString() });
     })
     .catch(next);
