@@ -24,7 +24,8 @@ const createCard = (req, res) => {
 };
 
 const deleteCard = (req, res, next) => {
-  Card.findById(req.params._id)
+  console.log(req.params);
+  Card.findById(req.params.id)
     .then((card) => {
       if (!card) {
         throw new NotFoundError('Нет карточки с таким id');
@@ -32,7 +33,7 @@ const deleteCard = (req, res, next) => {
       if (card.owner.toString() !== req.user._id) {
         throw new BadRequestError('Нет прав на удаление карточки');
       } else {
-        Card.findByIdAndDelete(req.params._id)
+        Card.findByIdAndDelete(req.params.id)
           // eslint-disable-next-line no-shadow
           .then((card) => {
             res.status(200).send(card);
@@ -53,7 +54,7 @@ const deleteCard = (req, res, next) => {
 
 const likeCard = (req, res) => {
   Card.findByIdAndUpdate(
-    req.params._id,
+    req.params.id,
     { $addToSet: { likes: req.user._id } }, // добавить _id в массив, если его там нет
     { new: true },
   )
@@ -74,7 +75,7 @@ const likeCard = (req, res) => {
 
 const dislikeCard = (req, res) => {
   Card.findByIdAndUpdate(
-    req.params._id,
+    req.params.id,
     { $pull: { likes: req.user._id } }, // убрать _id из массива
     { new: true },
   )

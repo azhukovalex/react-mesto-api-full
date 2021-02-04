@@ -26,14 +26,7 @@ mongoose.connect('mongodb://localhost:27017/mestodb', {
   useFindAndModify: false,
 });
 app.use(
-  cors({
-    origin: [
-      'http://localhost:3001',
-      'http://localhost:3000',
-      '*',
-    ],
-    credentials: true,
-  }),
+  cors(),
 );
 
 app.use(helmet());

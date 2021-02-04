@@ -4,7 +4,7 @@ import PopupWithForm from './PopupWithForm';
 export default function ConfPopup(props) {
   function handleSubmit(e) {    // Запрещаем браузеру переходить по адресу формы
     e.preventDefault();
-    props.onDelete()
+    props.onDelete(props.card)
   }
 
   return (
@@ -15,6 +15,7 @@ export default function ConfPopup(props) {
       onClose={props.onClose}
       isOpen={props.isOpen}
       onSubmit={handleSubmit}
+
     >
     </PopupWithForm>
   );

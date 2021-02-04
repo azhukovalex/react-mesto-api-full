@@ -36,23 +36,31 @@ const getCurrentUser = (req, res, next) => {
 };
 
 const createUser = (req, res, next) => {
-  bcrypt.hash(req.body.password, 10) // хешируем пароль
+  const {
+    name, about, avatar, email, password,
+  } = req.body;
+  bcrypt
+    .hash(password, 10)
     .then((hash) => User.create({
-      email: req.body.email,
-      name: req.body.name,
-      about: req.body.about,
-      avatar: req.body.avatar,
+      email,
       password: hash,
+      name,
+      about,
+      avatar,
     }))
-    .then((user) => User.find({ _id: user._id }))
-    .then((user) => res.status(201).send(user))
     .catch((err) => {
-      if (err.name === 'ValidationError') {
-        throw new BadRequestError({ message: `Ошибка при валидации: ${err}` });
-      } else {
-        throw new ServerError({ message: `Внутренняя ошибка сервера: ${err}` });
-      }
+      if (err.name === 'MongoError' || err.code === 11000) {
+        throw new BadRequestError('Пользователь с таким email уже существует');
+      } else next(err);
     })
+    .then((user) => res.status(201).send({
+      data: {
+        name: user.name,
+        about: user.about,
+        avatar,
+        email: user.email,
+      },
+    }))
     .catch(next);
 };
 

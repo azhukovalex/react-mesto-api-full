@@ -42,16 +42,16 @@ function App() {
 
   React.useEffect(() => {
     const jwt = localStorage.getItem("jwt")
-    console.log(localStorage);
     Promise.all([api.getUserInform(jwt), api.getCards(jwt)])
       .then(([user, cards]) => {
         setCurrentUser(user);
-        setCards(cards);
+        setCards(cards.reverse());
+
       })
       .catch((err) => {
         console.log(err);
       });
-  }, []);
+  }, [loggedIn]);
 
   function handleCardClick() {
     setIsCardSelected(true);
@@ -85,13 +85,14 @@ function App() {
   }
 
   function handleCardDelete(card) {
+    console.log(card);
     setCardDelete(card);
     handleConfDeleteClick();
   }
 
   function handleCardLike(card) {
-    const isLiked = card.likes.some(i => i._id === currentUser._id);
-    api.changeLikeCard(card._id, !isLiked).then((newCard) => {
+    const isLiked = card.likes.some(i => i === currentUser._id);
+    api.changeLikeCard(card._id, !isLiked, localStorage.getItem("jwt")).then((newCard) => {
       const newCards = cards.map((c) => c._id === card._id ? newCard : c);
       setCards(newCards);
     })
@@ -100,8 +101,8 @@ function App() {
       });;
   }
 
-  function handleConfirmDelete(card) {
-    api.deleteCard(cardDelete._id).then(() => {
+  function handleConfirmDelete(cardDelete) {
+    api.deleteCard(cardDelete._id, localStorage.getItem("jwt")).then(() => {
       const newCards = cards.filter((c) => c._id !== cardDelete._id);
       setCards(newCards);
       closeAllPopups();
@@ -112,7 +113,7 @@ function App() {
   }
 
   function handleUpdateUser(user) {
-    api.updateProfileInfo(user.name, user.about).then((result) => {
+    api.updateProfileInfo(user.name, user.about, localStorage.getItem("jwt")).then((result) => {
       setCurrentUser(result);
       closeAllPopups();
     })
@@ -122,7 +123,7 @@ function App() {
   }
 
   function handleAddPlaceSubmit(card) {
-    api.createNewCard(card.name, card.link).then((newCard) => {
+    api.createNewCard(card.name, card.link, localStorage.getItem("jwt")).then((newCard) => {
       setCards([newCard, ...cards]);
       closeAllPopups();
     })
@@ -132,7 +133,7 @@ function App() {
   }
 
   function handleUpdateAvatar(user) {
-    api.updateAvatar(user.avatar)
+    api.updateAvatar(user.avatar, localStorage.getItem("jwt"))
       .then((result) => {
         setCurrentUser(result);
         closeAllPopups();
@@ -193,10 +194,9 @@ function App() {
     return auth
       .authorize(email, password)
       .then((res) => {
-        console.log(res);
         if (res && res.token) {
           localStorage.setItem("jwt", res.token);
-          console.log(res);
+
           setLoggedIn(true);
           history.push("/");
         } else {
@@ -220,9 +220,10 @@ function App() {
     if (jwt) {
       auth.getContent(jwt).then((res) => {
         if (res) {
+
           setUserData({
-            id: res.data._id,
-            email: res.data.email,
+            id: res._id,
+            email: res.email,
           });
           setLoggedIn(true);
           history.push("/");
@@ -242,8 +243,8 @@ function App() {
   }
 
   React.useEffect(() => {
-    tokenCheck();
-    // eslint-disable-next-line
+    tokenCheck();    
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [loggedIn]);
 
   return (
@@ -303,9 +304,11 @@ function App() {
           onClose={closeAllPopups}
           onUpdateAvatar={handleUpdateAvatar}
         />
-        <ConfPopup isOpen={isConfPopupOpen}
+        <ConfPopup 
+          isOpen={isConfPopupOpen}
           onClose={closeAllPopups}
           onDelete={handleConfirmDelete}
+          card={cardDelete}
         />
         <ImagePopup onClose={closeAllPopups}
           isOpen={isCardSelected}

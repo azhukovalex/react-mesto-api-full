@@ -1,8 +1,7 @@
 class Api {
   constructor({ baseUrl, headers }) {
     this._url = baseUrl;
-    this._headers = headers;
-  }
+    }
 
   getUserInform(token) {
     return fetch(`${this._url}/users/me`, {
@@ -40,7 +39,7 @@ class Api {
       });
   }
 
-  updateProfileInfo(data, token) {
+  updateProfileInfo(name, about, token) {
     return fetch(`${this._url}/users/me`, {
       method: 'PATCH',
       headers: {
@@ -49,8 +48,8 @@ class Api {
         'Authorization': `Bearer ${token}`,
       },
       body: JSON.stringify({
-        name: data.name,
-        about: data.about
+        name: name,
+        about: about
       })
     })
       .then(res => {
@@ -61,7 +60,7 @@ class Api {
       });
   }
 
-  createNewCard(data, token) {
+  createNewCard(cardName, cardLink, token) {
     return fetch(`${this._url}/cards`, {
       method: 'POST',
       headers: {
@@ -70,8 +69,8 @@ class Api {
         'Authorization': `Bearer ${token}`,
       },
       body: JSON.stringify({
-        name: data.cardName,
-        link: data.cardLink
+        name: cardName,
+        link: cardLink
       })
     })
       .then(res => {
@@ -83,6 +82,7 @@ class Api {
   }
 
   deleteCard(cardId, token) {
+    console.log(cardId);
     return fetch(`${this._url}/cards/${cardId}`, {
       method: 'DELETE',
       headers: {
@@ -100,7 +100,8 @@ class Api {
       });
   }
 
-  changeLikeCard(cardId, status, token) {
+   changeLikeCard(cardId, status, token) {
+    
     return fetch(`${this._url}/cards/likes/${cardId}`, {
       method: `${(status) ? 'PUT' : 'DELETE'}`,
       headers: {
@@ -117,7 +118,8 @@ class Api {
       })
   }
 
-  updateAvatar(data, token) {
+  
+  updateAvatar(link, token) {
     return fetch(`${this._url}/users/me/avatar`, {
       method: 'PATCH',
       headers: {
@@ -126,7 +128,7 @@ class Api {
         'Authorization': `Bearer ${token}`,
       },
       body: JSON.stringify({
-        avatar: data.link
+        avatar: link
       })
     })
       .then(res => {
@@ -141,7 +143,7 @@ class Api {
 const api = new Api({
   baseUrl: 'http://localhost:3000',
   headers: {
-    authorization: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2MDE2ZjE5NzM0ZjBjODMwM2MxNzI1MDIiLCJpYXQiOjE2MTIxODY1ODQsImV4cCI6MTYxMjc5MTM4NH0.VpMBmYJXBhprs1wK-eL5I5rE6h1DIxdlBnBx_gobQiA',
+    //authorization: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2MDE2ZjE5NzM0ZjBjODMwM2MxNzI1MDIiLCJpYXQiOjE2MTIxODY1ODQsImV4cCI6MTYxMjc5MTM4NH0.VpMBmYJXBhprs1wK-eL5I5rE6h1DIxdlBnBx_gobQiA',
     'Content-Type': 'application/json'
   }
 });
