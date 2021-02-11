@@ -74,6 +74,7 @@ const likeCard = (req, res) => {
 };
 
 const dislikeCard = (req, res) => {
+  console.log(req.params);
   Card.findByIdAndUpdate(
     req.params.id,
     { $pull: { likes: req.user._id } }, // убрать _id из массива
