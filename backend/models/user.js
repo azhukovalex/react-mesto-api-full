@@ -1,4 +1,3 @@
-/* eslint-disable no-dupe-keys */
 const bcrypt = require('bcryptjs');
 const validator = require('validator');
 const mongoose = require('mongoose');
@@ -27,7 +26,8 @@ const userSchema = new mongoose.Schema({
       },
       message: 'Задайте другой пароль!',
     },
-    select: false, // необходимо добавить поле select
+    // eslint-disable-next-line no-dupe-keys
+    select: false,
   },
   name: { // у пользователя есть имя — опишем требования к имени в схеме:
     type: String,
