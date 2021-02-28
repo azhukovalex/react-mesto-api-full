@@ -3,4 +3,4 @@
 
 1. Домен бэкенда: api.azm.students.nomoredomains.icu
 2. Домен фронтенда: azm.students.nomoredomains.icu
-3. Публичный IP: 217.28.229.98 
+3. Публичный IP: 130.193.50.2
