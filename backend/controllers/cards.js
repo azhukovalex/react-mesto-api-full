@@ -30,7 +30,7 @@ const deleteCard = (req, res, next) => {
       if (!card) {
         throw new NotFoundError('Нет карточки с таким id');
       }
-      if (card.owner.toString() !== req.user._id) {
+      if (card.owner.toString() !== req.user._id.toString()) {
         throw new BadRequestError('Нет прав на удаление карточки');
       } else {
         Card.findByIdAndDelete(req.params.id)
@@ -41,18 +41,10 @@ const deleteCard = (req, res, next) => {
           .catch(next);
       }
     })
-    .catch((err) => {
-      if (err.name === 'DocumentNotFoundError') {
-        throw new NotFoundError({ message: 'Нет пользователя с таким Id' });
-      } else if (err.name === 'CastError') {
-        throw new BadRequestError({ message: `Введены некорректные данные: ${err.name}` });
-      } else {
-        throw new ServerError({ message: `Внутренняя ошибка сервера: ${err}` });
-      }
-    });
+    .catch(next);
 };
 
-const likeCard = (req, res) => {
+const likeCard = (req, res, next) => {
   Card.findByIdAndUpdate(
     req.params.id,
     { $addToSet: { likes: req.user._id } }, // добавить _id в массив, если его там нет
@@ -62,18 +54,13 @@ const likeCard = (req, res) => {
     .then((likes) => {
       res.status(200).send(likes);
     })
-    .catch((err) => {
-      if (err.message === 'NotValidId') {
-        throw new NotFoundError({ message: 'Нет пользователя с таким Id' });
-      } else if (err.name === 'CastError') {
-        throw new BadRequestError({ message: `Введены некорректные данные: ${err}` });
-      } else {
-        throw new ServerError({ message: `Внутренняя ошибка сервера: ${err}` });
-      }
-    });
+    .catch(() => {
+      throw new NotFoundError('Нет карточки с таким id');
+    })
+    .catch(next);
 };
 
-const dislikeCard = (req, res) => {
+const dislikeCard = (req, res, next) => {
   Card.findByIdAndUpdate(
     req.params.id,
     { $pull: { likes: req.user._id } }, // убрать _id из массива
@@ -83,15 +70,10 @@ const dislikeCard = (req, res) => {
     .then((likes) => {
       res.status(200).send(likes);
     })
-    .catch((err) => {
-      if (err.message === 'NotValidId') {
-        throw new NotFoundError({ message: `Нет пользователя с таким Id: ${err}` });
-      } else if (err.name === 'CastError') {
-        throw new BadRequestError({ message: `Введены некорректные данные: ${err}` });
-      } else {
-        throw new ServerError({ message: `Внутренняя ошибка сервера: ${err}` });
-      }
-    });
+    .catch(() => {
+      throw new NotFoundError('Нет карточки с таким id');
+    })
+    .catch(next);
 };
 
 module.exports = {

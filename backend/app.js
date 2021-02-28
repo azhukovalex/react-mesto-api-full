@@ -16,6 +16,7 @@ const NotFoundError = require('./errors/not-found-err');
 const ServerError = require('./errors/serv-err');
 const { validateUser, validateLogin } = require('./middlewares/validation');
 const { requestLogger, errorLogger } = require('./middlewares/logger');
+const errorHandler = require('./middlewares/errorHandler');
 
 // Слушаем 3000 порт
 const { PORT = 3000 } = process.env;
@@ -45,7 +46,7 @@ app.post('/signup', validateUser, createUser);
 app.use(auth);
 app.use('/', usersRoutes);
 app.use('/', cardsRouter);
-app.use(() => {
+app.use('*', () => {
   throw new NotFoundError('Запрашиваемый ресурс не найден');
 });
 
@@ -59,6 +60,8 @@ app.use((err, req, res) => {
   }
   throw new ServerError({ message: `На сервере произошла ошибка: ${err.message}` });
 });
+
+app.use(errorHandler);
 
 app.listen(PORT, () => {
   // Если всё работает, консоль покажет, какой порт приложение слушает
