@@ -2,6 +2,7 @@ const Card = require('../models/card');
 const BadRequestError = require('../errors/bad-req-err');
 const ServerError = require('../errors/serv-err');
 const NotFoundError = require('../errors/not-found-err');
+const ForbiddenError = require('../errors/forbidden-err');
 
 const getCards = (req, res) => Card.find({})
   .then((cards) => res.status(200).send(cards))
@@ -31,7 +32,7 @@ const deleteCard = (req, res, next) => {
         throw new NotFoundError('Нет карточки с таким id');
       }
       if (card.owner.toString() !== req.user._id.toString()) {
-        throw new BadRequestError('Нет прав на удаление карточки');
+        throw new ForbiddenError('Нет прав на удаление карточки');
       } else {
         Card.findByIdAndDelete(req.params.id)
           // eslint-disable-next-line no-shadow

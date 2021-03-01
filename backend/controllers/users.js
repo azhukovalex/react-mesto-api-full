@@ -4,6 +4,7 @@ const User = require('../models/user');
 const BadRequestError = require('../errors/bad-req-err');
 const ServerError = require('../errors/serv-err');
 const NotFoundError = require('../errors/not-found-err');
+const ConflictError = require('../errors/conflict-err');
 
 const { NODE_ENV, JWT_SECRET } = process.env;
 
@@ -14,7 +15,7 @@ const getUsers = (req, res, next) => {
 };
 
 const getProfile = (req, res, next) => {
-  User.findById(req.user._id)
+  User.findById(req.params.id)
     .orFail(new Error('NotValidId'))
     .then((user) => res.send({ data: user }))
     .catch((err) => {
@@ -50,7 +51,7 @@ const createUser = (req, res, next) => {
     }))
     .catch((err) => {
       if (err.name === 'MongoError' || err.code === 11000) {
-        throw new BadRequestError('Пользователь с таким email уже существует');
+        throw new ConflictError('Пользователь с таким email уже существует');
       } else next(err);
     })
     .then((user) => res.status(201).send({
